@@ -101,6 +101,10 @@ JNIEXPORT void JNICALL Java_kernel_unisocsu_chords_1app_nativebridge_NativeWhisp
     p.n_threads = threads;
     p.no_context = true;
     p.single_segment = false;
+    /* Keep the decoder KV/cache bounded on low-RAM KitKat devices. */
+    p.audio_ctx = 512;
+    p.n_max_text_ctx = 128;
+    p.max_len = 0;
     int rc = whisper_full((struct whisper_context*)ptr, p, data, n);
     LOGI("whisper_full returned %d", rc);
     (*env)->ReleaseFloatArrayElements(env, audio, data, JNI_ABORT);
