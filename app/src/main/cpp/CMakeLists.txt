@@ -6,6 +6,19 @@ set(CMAKE_CXX_STANDARD 11)
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../..")
 set(WHISPER_ROOT "${PROJECT_ROOT}/third_party/whisper.cpp")
 set(CHORD_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/chord")
+set(CHORD_ARCHIVE "${CMAKE_CURRENT_SOURCE_DIR}/chord-src.tar.gz")
+
+if(NOT EXISTS "${CHORD_ROOT}/chord.c")
+    file(MAKE_DIRECTORY "${CHORD_ROOT}")
+    execute_process(
+        COMMAND "${CMAKE_COMMAND}" -E tar xzf "${CHORD_ARCHIVE}"
+        WORKING_DIRECTORY "${CHORD_ROOT}"
+        RESULT_VARIABLE CHORD_EXTRACT_RESULT
+    )
+    if(NOT CHORD_EXTRACT_RESULT EQUAL 0 OR NOT EXISTS "${CHORD_ROOT}/chord.c")
+        message(FATAL_ERROR "Failed to extract chord implementation from chord-src.tar.gz")
+    endif()
+endif()
 
 if(NOT EXISTS "${WHISPER_ROOT}/src/whisper.cpp")
     message(FATAL_ERROR "Missing third_party/whisper.cpp. Run tools/fetch-whisper.sh first.")
