@@ -74,7 +74,7 @@ public final class MainActivity extends Activity {
                     WhisperEngine whisper = new WhisperEngine(getAssets(), WHISPER_MODEL_ASSET);
                     List<TimedSegment> words;
                     try {
-                        words = whisper.transcribe(audio, 2);
+                        words = whisper.transcribeChunked(audio, 2);
                     } finally {
                         whisper.close();
                     }
