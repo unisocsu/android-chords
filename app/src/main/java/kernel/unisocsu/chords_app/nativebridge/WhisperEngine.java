@@ -8,8 +8,9 @@ import kernel.unisocsu.chords_app.model.TimedSegment;
 
 public final class WhisperEngine implements AutoCloseable {
     private static final int SAMPLE_RATE = 16000;
-    private static final int CHUNK_SECONDS = 45;
+    private static final int CHUNK_SECONDS = 60;
     private static final int OVERLAP_SECONDS = 1;
+    private static final int CENTISECONDS_PER_SECOND = 100;
     private static final float SILENCE_RMS = 0.008f;
 
     private long context;
@@ -36,12 +37,13 @@ public final class WhisperEngine implements AutoCloseable {
     }
 
     /**
-     * Processes bounded audio windows instead of passing a multi-minute buffer to
-     * Whisper at once. A small overlap preserves words crossing a chunk boundary.
-     * Very quiet chunks are skipped, reducing unnecessary CPU work on silence.
+     * Processes bounded windows instead of one large audio buffer.
+     * A one-second overlap preserves words crossing a window boundary;
+     * segments inside the overlap are taken from the preceding window.
      */
     public List<TimedSegment> transcribeChunked(float[] audio, int threads) {
         if (context == 0) throw new IllegalStateException("Whisper context released");
+
         List<TimedSegment> result = new ArrayList<TimedSegment>();
         final int chunk = CHUNK_SECONDS * SAMPLE_RATE;
         final int overlap = OVERLAP_SECONDS * SAMPLE_RATE;
@@ -55,25 +57,44 @@ public final class WhisperEngine implements AutoCloseable {
             return result;
         }
 
-        for (int start = 0; start < audio.length; start += step) {
+        int start = 0;
+        boolean first = true;
+        while (start < audio.length) {
             int end = Math.min(audio.length, start + chunk);
             if (end <= start) break;
+
             if (!isSilent(audio, start, end)) {
                 float[] window = new float[end - start];
                 System.arraycopy(audio, start, window, 0, window.length);
+
                 NativeWhisper.fullTranscribe(context, threads, window);
-                List<TimedSegment> segments = readSegments(start * 1000L / SAMPLE_RATE);
-                for (TimedSegment segment : segments) {
-                    // The one-second overlap can produce duplicate boundary text.
-                    // Keep a segment only when its absolute start is beyond the
-                    // previous accepted segment's start.
-                    if (result.isEmpty() ||
-                            segment.getStartMs() > result.get(result.size() - 1).getStartMs()) {
-                        result.add(segment);
-                    }
+
+                long offsetCs = ((long) start * CENTISECONDS_PER_SECOND) / SAMPLE_RATE;
+                long skipCs = first ? 0L : ((long) overlap * CENTISECONDS_PER_SECOND) / SAMPLE_RATE;
+
+                int count = NativeWhisper.segmentCount(context);
+                for (int i = 0; i < count; i++) {
+                    long localStart = NativeWhisper.segmentStart(context, i);
+                    if (localStart < skipCs) continue;
+
+                    result.add(new TimedSegment(
+                            localStart + offsetCs,
+                            NativeWhisper.segmentEnd(context, i) + offsetCs,
+                            NativeWhisper.segmentText(context, i)));
                 }
             }
+
             if (end == audio.length) break;
+
+            // If the remaining tail fits in one normal window, move the next
+            // window to the end rather than creating a tiny third window.
+            int next = start + step;
+            if (audio.length - next <= chunk) {
+                next = audio.length - chunk;
+            }
+            if (next <= start) break;
+            start = next;
+            first = false;
         }
         return result;
     }
@@ -81,6 +102,7 @@ public final class WhisperEngine implements AutoCloseable {
     private boolean isSilent(float[] audio, int start, int end) {
         int length = end - start;
         if (length <= 0) return true;
+
         double sum = 0.0;
         int stride = Math.max(1, length / 8000);
         int count = 0;
@@ -92,13 +114,13 @@ public final class WhisperEngine implements AutoCloseable {
         return count == 0 || Math.sqrt(sum / count) < SILENCE_RMS;
     }
 
-    private List<TimedSegment> readSegments(long offsetMs) {
+    private List<TimedSegment> readSegments(long offsetCs) {
         int count = NativeWhisper.segmentCount(context);
         List<TimedSegment> result = new ArrayList<TimedSegment>(count);
         for (int i = 0; i < count; i++) {
             result.add(new TimedSegment(
-                    NativeWhisper.segmentStart(context, i) + offsetMs,
-                    NativeWhisper.segmentEnd(context, i) + offsetMs,
+                    NativeWhisper.segmentStart(context, i) + offsetCs,
+                    NativeWhisper.segmentEnd(context, i) + offsetCs,
                     NativeWhisper.segmentText(context, i)));
         }
         return result;
