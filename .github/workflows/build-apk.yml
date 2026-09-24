@@ -24,7 +24,21 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"             "platform-tools"             "platforms;android-34"             "build-tools;34.0.0"             "cmake;3.22.1"             "ndk;25.2.9519653"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "cmake;3.22.1" \
+            "ndk;25.2.9519653"
+
+      - name: Bootstrap Gradle
+        run: |
+          curl -fsSL -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          rm -rf /tmp/gradle
+          mkdir -p /tmp/gradle
+          unzip -q /tmp/gradle.zip -d /tmp/gradle
+          /tmp/gradle/gradle-8.2/bin/gradle --version
+          /tmp/gradle/gradle-8.2/bin/gradle wrapper --gradle-version 8.2
 
       - name: Prepare build
         run: |
