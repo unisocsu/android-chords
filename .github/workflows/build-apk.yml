@@ -24,12 +24,7 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0" \
-            "cmake;3.22.1" \
-            "ndk;25.2.9519653"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"             "platform-tools"             "platforms;android-34"             "build-tools;34.0.0"             "cmake;3.22.1"             "ndk;25.2.9519653"
 
       - name: Bootstrap Gradle
         run: |
@@ -44,9 +39,15 @@ jobs:
         run: |
           chmod +x gradlew
           chmod +x tools/fetch-whisper.sh
+          mkdir -p app/src/main/assets
 
       - name: Fetch whisper.cpp
         run: ./tools/fetch-whisper.sh
+
+      - name: Fetch bundled Whisper model
+        run: |
+          curl -L --fail --retry 3             "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q5_1.bin"             -o app/src/main/assets/ggml-tiny-q5_1.bin
+          test -s app/src/main/assets/ggml-tiny-q5_1.bin
 
       - name: Build debug APK
         run: ./gradlew --no-daemon --stacktrace assembleDebug

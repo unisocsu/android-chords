@@ -17,6 +17,7 @@ import kernel.unisocsu.chords_app.nativebridge.WhisperEngine;
 
 public final class MainActivity extends Activity {
     private static final int PICK_AUDIO = 41;
+    private static final String WHISPER_MODEL_ASSET = "ggml-tiny-q5_1.bin";
     private TextView status, result;
     private Button analyze;
     private ProgressBar progress;
@@ -70,7 +71,7 @@ public final class MainActivity extends Activity {
                 try {
                     final float[] audio = AudioDecoder.decodeTo16kMono(MainActivity.this, selectedUri);
                     final List<Chord> chords = new ChordEngine().detect(audio, 16000);
-                    WhisperEngine whisper = new WhisperEngine("/sdcard/ChordsApp/model.bin");
+                    WhisperEngine whisper = new WhisperEngine(getAssets(), WHISPER_MODEL_ASSET);
                     List<TimedSegment> words;
                     try {
                         words = whisper.transcribe(audio, 2);
