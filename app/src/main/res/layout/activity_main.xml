@@ -1,23 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="16dp">
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="Chords App" android:textSize="24sp" android:textStyle="bold"/>
-    <Button android:id="@+id/selectButton" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="בחר קובץ שמע"/>
-    <Button android:id="@+id/analyzeButton" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:enabled="false" android:text="נתח שיר"/>
-    <Button android:id="@+id/exportPdfButton" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:enabled="false" android:text="ייצא ל-PDF"/>
-    <ProgressBar android:id="@+id/progress" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:visibility="gone"/>
-    <TextView android:id="@+id/status" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="12dp"/>
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:layout_marginTop="12dp">
-        <TextView android:id="@+id/result" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:textIsSelectable="true"
-            android:textSize="16sp" android:fontFamily="monospace"/>
-    </ScrollView>
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="24dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chords"
+            android:textColor="#171923"
+            android:textSize="30sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="זיהוי מילים ואקורדים מתוך קובץ שמע"
+            android:textColor="#6B7280"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/selectButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_secondary_button"
+            android:text="בחר קובץ שמע"
+            android:textAllCaps="false"
+            android:textColor="#303F9F"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/analyzeButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_primary_button"
+            android:enabled="false"
+            android:text="נתח שיר"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:text="בחר קובץ כדי להתחיל"
+                android:textColor="#4B5563"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="תוצאה"
+            android:textColor="#171923"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_result"
+            android:padding="16dp">
+            <TextView
+                android:id="@+id/result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="3dp"
+                android:textColor="#20232D"
+                android:textIsSelectable="true"
+                android:textSize="16sp"/>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/exportPdfButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_secondary_button"
+            android:enabled="false"
+            android:text="ייצא ל-PDF"
+            android:textAllCaps="false"
+            android:textColor="#303F9F"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</ScrollView>
