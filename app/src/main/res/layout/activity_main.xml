@@ -8,6 +8,8 @@
         android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="בחר קובץ שמע"/>
     <Button android:id="@+id/analyzeButton" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:enabled="false" android:text="נתח שיר"/>
+    <Button android:id="@+id/exportPdfButton" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:enabled="false" android:text="ייצא ל-PDF"/>
     <ProgressBar android:id="@+id/progress" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:visibility="gone"/>
     <TextView android:id="@+id/status" android:layout_width="match_parent"
